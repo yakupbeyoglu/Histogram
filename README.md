@@ -6,3 +6,4 @@ This project included Simple Histogram Functions and Operations. work with color
 4-Gamma Brightness function ((2^b)-1)*(I(x,y)/(2^b)-1)))^gammaparamater
 5-Contrast (parameter c)*(I-ceil(((2^b)-1)/2)+ceil(((2^b)-1)/2
 6-invert  ((2^b)-1)-I(x,y)
+ 
