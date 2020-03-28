@@ -52,7 +52,8 @@ public:
 	Gorgon::Graphics::Bitmap ContastStrechingColorFullImage()const {
 		Gorgon::Graphics::Bitmap streched = source.Duplicate();
 		// check no channel 
-		int nochannel = source.GetMode() != Gorgon::Graphics::ColorMode::Grayscale ? 3 : 1;
+		
+		int nochannel = source.GetMode() != Gorgon::Graphics::ColorMode::Grayscale? 3 : 1;
 
 		for (int y = 0; y < source.GetHeight(); y++) {
 			for (int x = 0; x < source.GetWidth(); x++) {
@@ -148,12 +149,82 @@ public:
 		return equalized;
 	}
 
+	Gorgon::Graphics::Bitmap Brightness(const int brightness )const {
+		Gorgon::Graphics::Bitmap bmp = source.Duplicate();
+		int nochannel = source.GetMode() != Gorgon::Graphics::ColorMode::Grayscale ? 3 : 1;
+		int threshhold =brightness>=0? 255 - brightness:0-brightness;
+		for (int y = 0; y < source.GetHeight(); y++) {
+			for (int x = 0; x < source.GetWidth(); x++) {
+				
+					for (int c = 0; c < nochannel; c++) {
+						if (brightness >= 0) {
+							if (source(x, y, c) <= threshhold)
+								bmp(x, y, c) = source(x, y, c) + brightness;
+							else
+								bmp(x, y, c) = 255;
+						}
+						else {
+							if (source(x, y, c) <= threshhold)
+								bmp(x, y, c) = 0;
+							else
+								bmp(x, y, c) = source(x, y, c) + brightness;;
+						}
+					}
+			
+			
+
+			}
+
+		}
+
+		return bmp;
+	}
+
+	Gorgon::Graphics::Bitmap BrightnessGama(const float gamma) {
+		Gorgon::Graphics::Bitmap bmp = source.Duplicate();
+		int nochannel = source.GetMode() != Gorgon::Graphics::ColorMode::Grayscale ? 3 : 1;
+		for (int y = 0; y < source.GetHeight(); y++) {
+			for (int x = 0; x < source.GetWidth(); x++) {
+
+					for (int c = 0; c < nochannel; c++) 
+						bmp(x, y, c) = 255 * std::pow(((float)source(x, y, c) / 255), gamma);
+					
+			
+				
+
+			}
+
+		}
+
+		return bmp;
+
+
+	}
+	Gorgon::Graphics::Bitmap Invert() {
+		Gorgon::Graphics::Bitmap bmp = source.Duplicate();
+		int nochannel = source.GetMode() != Gorgon::Graphics::ColorMode::Grayscale ? 3 : 1;
+		for (int y = 0; y < source.GetHeight(); y++) {
+			for (int x = 0; x < source.GetWidth(); x++) {
+
+				for (int c = 0; c < nochannel; c++)
+					bmp(x, y, c) = 255 - source(x, y, c);
+
+
+
+
+			}
+
+		}
+
+		return bmp;
+
+
+	}
 private:
 	Gorgon::Graphics::Bitmap source;
 	int min[3];
 	int max[3];
-	// we have 256 different value if our bitdepth = 8
-
+	// we have 256 different value if our bitdepth = 8  also we have 3 channel 
 	int histogram[3][256] = { {} };
 	float pdf[3][256] = { {} };
 	float cdf[3][256] = { {} };
@@ -161,13 +232,33 @@ private:
 int main(){
 
 	Gorgon::Graphics::Bitmap source;
-	source.Import("test.png");
+	source.Import("read.png");
 	Histogram histogramprocess(source);
 	
 	Gorgon::Graphics::Bitmap contraststreched = histogramprocess.ContastStrechingColorFullImage();
-	Gorgon::Graphics::Bitmap histogramequalization = histogramprocess.HistogramEqualization();
 	contraststreched.ExportPNG("contrastreching.png");
+	std::cout << "Contrast Streching Completeed !" << std::endl;
+
+	Gorgon::Graphics::Bitmap histogramequalization = histogramprocess.HistogramEqualization();
 	histogramequalization.ExportPNG("histogramequalization.png");
+	std::cout << "Histogram equalization completed ! " << std::endl;
+
+	Gorgon::Graphics::Bitmap lighter= histogramprocess.Brightness(100);
+	lighter.ExportPNG("ligted_brightness.png");
+	Gorgon::Graphics::Bitmap darker = histogramprocess.Brightness(-100);
+	darker.ExportPNG("darked_brightness.png");
+	// increase only 3rd channel which is = blue if you have a grayscale image this line will give warning to console and return same image
+	Gorgon::Graphics::Bitmap Brightnessgamma = histogramprocess.BrightnessGama(2.5);
+	Brightnessgamma.ExportPNG("gamma brigtness .png");
+
+	Gorgon::Graphics::Bitmap invert = histogramprocess.Invert();
+	invert.ExportPNG("Invert.png");
+
+
+
+
+
+
 	std::cout << "Completed !!! " << std::endl;
 
 	
