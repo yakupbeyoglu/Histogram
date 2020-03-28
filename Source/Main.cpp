@@ -200,6 +200,39 @@ public:
 
 
 	}
+	Gorgon::Graphics::Bitmap Contrast(float c) {
+
+		Gorgon::Graphics::Bitmap bmp = source.Duplicate();
+		int nochannel = source.GetMode() != Gorgon::Graphics::ColorMode::Grayscale ? 3 : 1;
+		// 255 = 2^b-1 , b is = bit depth our one is =8  so 255 we get max value 
+		int max = std::ceil((float)255 / 2);
+		//contrast correction  actually parameter correction limited to -255  to 255
+		float factor = (259 * (c + 255)) / (255 * (259 - c));
+		// contrast correction for limitation value used at here if you dont want you can use below lineand close this. you need to give small value
+		//float factor = c;
+		for (int y = 0; y < source.GetHeight(); y++) {
+			for (int x = 0; x < source.GetWidth(); x++) {
+
+				for (int channel = 0; channel < nochannel; channel++) {
+					int value= factor * ((int)source(x, y, channel) - max) + max;
+					if (value < 0)
+						value = 0;
+					else if (value > 255)
+						value = 255;
+
+					bmp(x, y, channel) = value;
+				}
+
+
+
+			}
+
+		}
+
+		return bmp;
+
+
+	}
 	Gorgon::Graphics::Bitmap Invert() {
 		Gorgon::Graphics::Bitmap bmp = source.Duplicate();
 		int nochannel = source.GetMode() != Gorgon::Graphics::ColorMode::Grayscale ? 3 : 1;
@@ -242,20 +275,22 @@ int main(){
 	Gorgon::Graphics::Bitmap histogramequalization = histogramprocess.HistogramEqualization();
 	histogramequalization.ExportPNG("histogramequalization.png");
 	std::cout << "Histogram equalization completed ! " << std::endl;
-
+	//brightnes function used  Ixy+b
 	Gorgon::Graphics::Bitmap lighter= histogramprocess.Brightness(100);
 	lighter.ExportPNG("ligted_brightness.png");
 	Gorgon::Graphics::Bitmap darker = histogramprocess.Brightness(-100);
 	darker.ExportPNG("darked_brightness.png");
-	// increase only 3rd channel which is = blue if you have a grayscale image this line will give warning to console and return same image
+	// gamma funtion
 	Gorgon::Graphics::Bitmap Brightnessgamma = histogramprocess.BrightnessGama(2.5);
-	Brightnessgamma.ExportPNG("gamma brigtness .png");
-
+	Brightnessgamma.ExportPNG("gamma brigtness.png");
+	//contrast functions  for negative and positive contrast
+	Gorgon::Graphics::Bitmap contrast = histogramprocess.Contrast(-50);
+	contrast.ExportPNG("contrastfunction negative.png");
+	Gorgon::Graphics::Bitmap contrast2 = histogramprocess.Contrast(50);
+	contrast2.ExportPNG("contrastfunction positive.png");
+	//invert
 	Gorgon::Graphics::Bitmap invert = histogramprocess.Invert();
 	invert.ExportPNG("Invert.png");
-
-
-
 
 
 
