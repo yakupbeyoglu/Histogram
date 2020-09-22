@@ -1,5 +1,5 @@
 # Histogram Process
-This project included Simple Histogram Functions and Operations. work with colorful and grayscale image. Developed with c++ & Gorgon Game Engine
+This project included Simple ImageProcessing Histogram Functions and Operations. work with colorful and grayscale image. Developed with C++ & Gorgon Game Engine
 ## 1-Histogram Equalization
 ## 2-Contrast Streching 
 ## 3-Simple Brightness function I(x,y)+bparamater
